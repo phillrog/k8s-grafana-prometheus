@@ -1,0 +1,36 @@
+# Instalar jager no k8s allinone o mais simples
+
+# instalar cert
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.0/cert-manager.yaml
+
+# cria o contexto
+kubectl create namespace observability
+
+# instala recurso personalizado apiVersion: jaegertracing.io/v1
+kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.49.0/jaeger-operator.yaml -n observability
+
+# cria o simplest
+kubectl apply -f simplest.yaml
+
+$ kubectl get jaegers
+NAME        CREATED AT
+simplest    28s
+
+$ kubectl get pods -l app.kubernetes.io/instance=simplest
+NAME                        READY     STATUS    RESTARTS   AGE
+simplest-6499bb6cdd-kqx75   1/1       Running   0          2m
+
+cópia de
+$ kubectl logs -l app.kubernetes.io/instance=simplest
+...
+{"level":"info","ts":1699714007.7955894,"caller":"grpc@v1.57.0/clientconn.go:1303","msg":"[core][Channel #1 SubChannel #2] Subchannel Connectivity change to IDLE, last error: connection error: desc = \"transport: Error while dialing: dial tcp [::1]:4317: connect: connection refused\"","system":"grpc","grpc_log":true}
+
+$ kubectl logs -l app.kubernetes.io/instance=simplest -c jaeger
+...
+{"level":"info","ts":1699714007.8241854,"caller":"grpc@v1.57.0/clientconn.go:565","msg":"[core][Channel #12] Channel Connectivity change to READY","system":"grpc","grpc_log":true}
+
+127.0.0.1
+
+ou
+
+kubectl port-forward svc/simplest-query 16686:16686
