@@ -1,0 +1,28 @@
+### Instalar o operador RabbitMQ
+ kubectl apply -f https://github.com/rabbitmq/cluster-operator/releases/latest/download/cluster-operator.yml
+
+### Verifica os componentes no namespace rabbitmq-system
+kubectl get all -o wide -n rabbitmq-system
+
+
+### Verifica o cluster local
+kubectl describe RabbitmqCluster local-rabbitmqcluster 
+
+### Cria a secret Username
+$ kubectl get secret local-rabbitmqcluster-default-user -o jsonpath='{.data.username}' | base64 --decode
+
+### Cria a secret Password
+$ kubectl get secret local-rabbitmqcluster-default-user -o jsonpath='{.data.password}' | base64 --decode
+
+
+### Verifica o cluster inteiro rabbitmq
+kubectl get all -l app.kubernetes.io/part-of=rabbitmq
+
+### Veriifica status do cluster
+ kubectl exec local-rabbitmqcluster-server-0 -- /bin/sh -c "rabbitmqctl cluster_status --formatter json" | jq
+
+### Verifica os nós
+kubectl exec local-rabbitmqcluster-server-0 -- /bin/sh -c "rabbitmqctl cluster_status --formatter json" | jq -r.running_nodes 
+
+### Pega endereço da UI Web
+kubectl get svc local-rabbitmqcluster -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
