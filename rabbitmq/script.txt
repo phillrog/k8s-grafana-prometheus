@@ -26,3 +26,22 @@ kubectl exec local-rabbitmqcluster-server-0 -- /bin/sh -c "rabbitmqctl cluster_s
 
 ### Pega endereço da UI Web
 kubectl get svc local-rabbitmqcluster -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+### Teste Consumer - https://github.com/pavan-kumar-99/medium-manifests
+
+git clone https://github.com/pavan-kumar-99/medium-manifests.git 
+-b rabbitmq
+
+cd medium-manifests/
+
+helm install receive-service rabbitmq-helm/receive-service --set configmap.rmq_url="amqp://guest:guest@ip-rabbitmq:5672/"
+
+### Teste Pubblish - https://github.com/pavan-kumar-99/medium-manifests
+
+git clone https://github.com/pavan-kumar-99/medium-manifests.git 
+-b rabbitmq
+
+cd medium-manifests/
+
+sh test_rmq.sh
+
